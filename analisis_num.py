@@ -1,0 +1,1 @@
+# [TP 2] Bolzano, Newton-Raphson, Regla del Trapecio y de Simpson
