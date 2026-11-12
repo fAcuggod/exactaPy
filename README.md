@@ -28,8 +28,9 @@ python3 -m mypy --strict definiciones.py matriz.py
 Para correr las pruebas unitarias del TP 0:
 ```bash
 python3 -m unittest tests/test_matriz.py
-
-# Para evaluar líneas y ramas cubiertas por los tests y generar el reporte visual:
+```
+Para evaluar líneas y ramas cubiertas por los tests y generar el reporte visual:
+```bash
 python3 -m coverage run --include=matriz.py,algebra.py --branch -m unittest discover -s tests
 python3 -m coverage report -m
 python3 -m coverage html
