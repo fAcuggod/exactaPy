@@ -1,0 +1,1 @@
+# Enums, Dataclasses de resultados, alias de tipos y Excepciones
