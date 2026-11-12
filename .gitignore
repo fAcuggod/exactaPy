@@ -1,0 +1,14 @@
+# Archivos temporales de Python y caché de tipos
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+
+# Archivos generados por coverage
+.coverage
+coverage.json
+htmlcov/
+
+# Entornos virtuales
+venv/
+.venv/
