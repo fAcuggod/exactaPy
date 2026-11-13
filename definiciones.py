@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from fractions import Fraction
-from typing import TypeAlias
+from typing import TypeAlias, TYPE_CHECKING
 from collections.abc import Sequence
 
 ### 1. ALIAS DE TIPOS
@@ -68,3 +68,28 @@ class OperacionElemental:
     descripcion: str
     fila_origen: int | None = None
     factor: Escalar | None = None
+
+if TYPE_CHECKING:
+    from matriz import Matriz
+
+
+@dataclass(frozen=True)
+class ResultadoEscalonamiento:
+    """Resultado completo del algoritmo de Gauss-Jordan (Ejercicio 4)."""
+
+    rref: Matriz
+    pasos: tuple[OperacionElemental, ...]
+    columnas_pivote: tuple[int, ...]
+    intercambios_realizados: int
+
+
+@dataclass(frozen=True)
+class SolucionSistema:
+    """Resultado completo de resolver y clasificar Ax = b (Ejercicio 5)."""
+
+    clasificacion: ClasificacionSistema
+    rango_a: int
+    rango_ampliada: int
+    solucion_particular: Vector | None
+    base_nucleo: tuple[Vector, ...]
+    pasos_gauss: tuple[OperacionElemental, ...]
