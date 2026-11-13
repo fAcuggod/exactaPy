@@ -21,8 +21,6 @@ class Matriz:
         - Para toda fila r en _celdas: len(r) == _columnas.
         - Todos los elementos almacenados en _celdas son instancias de Fraction.
     """
-
-    # Declaración de tipos de los atributos privados para mypy --strict
     _celdas: tuple[tuple[Escalar, ...], ...]
     _filas: int
     _columnas: int
