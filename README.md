@@ -1,6 +1,6 @@
 # ExactaPy: Álgebra Lineal y Análisis Matemático I
 
-Motor matemático local desarrollado desde cero en **Python 3.10+** con fines de aprendizaje en Programación Orientada a Objetos (POO), programación funcional, cálculo numérico y simbólico. 
+Motor matemático local desarrollado desde cero en **Python 3.10+** con fines de aprendizaje en Programación Orientada a Objetos (POO), programación funcional, cálculo numérico y simbólico.
 
 Todos los algoritmos algebraicos operan sobre el cuerpo de los números racionales ($\mathbb{Q}$) mediante `fractions.Fraction`, eliminando errores de redondeo de punto flotante (IEEE 754).
 
@@ -20,6 +20,7 @@ Todos los algoritmos algebraicos operan sobre el cuerpo de los números racional
 ## Comandos Útiles de Desarrollo
 
 ### 1. Chequeo de tipado estático (Mypy)
+
 Para verificar que todas las firmas y variables respeten sus tipos:
 ```bash
 python3 -m mypy --strict definiciones.py matriz.py
