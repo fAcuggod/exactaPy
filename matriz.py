@@ -91,7 +91,6 @@ class Matriz:
         Raises:
             IndexError: Si i o j están fuera de los rangos [0, filas) o [0, columnas).
         """
-        # Desempaquetamos la tupla de índices en dos variables enteras:
         i, j = indices
 
         if 0 <= i < self._filas and 0 <= j < self._columnas:
@@ -129,7 +128,6 @@ class Matriz:
 
     def __eq__(self, otro: object) -> bool:
         """Compara si dos matrices son matemáticamente iguales celda por celda."""
-        # En mypy --strict, __eq__ debe aceptar 'object' porque alguien podría comparar A == "hola".
         if not isinstance(otro, Matriz):
             return False
 

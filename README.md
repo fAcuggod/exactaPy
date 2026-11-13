@@ -24,12 +24,18 @@ Todos los algoritmos algebraicos operan sobre el cuerpo de los números racional
 Para verificar que todas las firmas y variables respeten sus tipos:
 ```bash
 python3 -m mypy --strict definiciones.py matriz.py
-
+```
 ### 2. Ejecutar los casos de test
 Para correr las pruebas unitarias del TP 0:
+```bash
 python3 -m unittest tests/test_matriz.py
-
+```
 Para evaluar líneas y ramas cubiertas por los tests y generar el reporte visual:
+```bash
 python3 -m coverage run --include=matriz.py,algebra.py --branch -m unittest discover -s tests
 python3 -m coverage report -m
 python3 -m coverage html
+<<<<<<< HEAD
+=======
+```
+>>>>>>> 300a975ea1f238709b8ac92ef304bc37de69b5c8
