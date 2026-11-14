@@ -4,22 +4,20 @@ from dataclasses import dataclass
 from enum import Enum
 from fractions import Fraction
 from typing import TypeAlias, TYPE_CHECKING
-from collections.abc import Sequence
+from collections.abc import Sequence, Callable
 
 ### 1. ALIAS DE TIPOS
 
-# Un Escalar es siempre un racional (Fraction).
 Escalar: TypeAlias = Fraction
 
-# Cuando el usuario crea una matriz, puede pasarnos enteros, strings ("3/4") o Fractions.
 EntradaEscalar: TypeAlias = int | str | Fraction
 
 # Un Vector es una lista de escalares.
 Vector: TypeAlias = list[Escalar]
 
-# Una Grilla de entrada es una secuencia de filas con valores convertibles a Fraction.
 GrillaEntrada: TypeAlias = Sequence[Sequence[EntradaEscalar]]
 
+FuncionReal: TypeAlias = Callable[[float], float]
 
 ### 2. JERARQUÍA DE EXCEPCIONES PERSONALIZADAS
 
@@ -39,7 +37,14 @@ class MatrizSingularError(ExactaPyError):
     """Se lanza al intentar invertir una matriz con determinante nulo (no inversible)."""
 
 
-### 3. ENUMERADOS (Conjuntos cerrados de constantes simbólicas)
+class HipotesisDeBolzanoError(ValueError):
+    """Se lanza cuando el intervalo [a, b] no cumple las hipótesis de Bolzano."""
+
+
+class DerivadaNulaError(ArithmeticError):
+    """Se lanza cuando la derivada en Newton-Raphson es nula o casi nula."""
+
+### 3. ENUMERADOS
 
 class TipoOperacionElemental(Enum):
     """Tipos de operaciones elementales por fila en el método de Gauss-Jordan."""
@@ -57,7 +62,7 @@ class ClasificacionSistema(Enum):
     INCOMPATIBLE = "Sistema Incompatible (SI)"
 
 
-### 4. DATACLASSES INMUTABLES (Objetos de transferencia de resultados para TP 1)
+### 4. DATACLASSES INMUTABLES
 
 @dataclass(frozen=True)
 class OperacionElemental:
@@ -93,3 +98,22 @@ class SolucionSistema:
     solucion_particular: Vector | None
     base_nucleo: tuple[Vector, ...]
     pasos_gauss: tuple[OperacionElemental, ...]
+
+@dataclass(frozen=True)
+class PasoIteracion:
+    """Estado de un paso individual en un método numérico de búsqueda de raíces."""
+
+    iteracion: int
+    aproximacion: float
+    valor_f: float
+    error_estimado: float
+
+
+@dataclass(frozen=True)
+class ResultadoRaiz:
+    """Reporte completo de convergencia y traza de un método de búsqueda de raíces."""
+
+    raiz_aproximada: float
+    iteraciones_realizadas: int
+    convergio: bool
+    historial_iteraciones: tuple[PasoIteracion, ...]

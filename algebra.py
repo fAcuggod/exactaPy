@@ -5,7 +5,6 @@ from collections.abc import Sequence
 from fractions import Fraction
 from definiciones import (
     ClasificacionSistema,
-    DimensionesIncompatiblesError,
     EntradaEscalar,
     Escalar,
     OperacionElemental,
