@@ -75,10 +75,10 @@ def biseccion_bolzano(
             a = punto_medio
             imagen_a = imagen_m
 
-        return ResultadoRaiz(raiz_aproximada=(a+b)/2,
-                             iteraciones_realizadas=max_iter,
-                             convergio=False,
-                             historial_iteraciones=tuple(iteraciones))
+    return ResultadoRaiz(raiz_aproximada=(a+b)/2,
+                        iteraciones_realizadas=max_iter,
+                        convergio=False,
+                        historial_iteraciones=tuple(iteraciones))
 
 def newton_raphson(
     f: FuncionReal,
@@ -125,10 +125,10 @@ def newton_raphson(
         x0 = nuevo_punto
         imagen_x0 = imagen_nuevo_punto
 
-        return ResultadoRaiz(raiz_aproximada=nuevo_punto,
-                             iteraciones_realizadas=max_iter,
-                             convergio=False,
-                             historial_iteraciones=tuple(iteraciones))
+    return ResultadoRaiz(raiz_aproximada=x0,
+                        iteraciones_realizadas=max_iter,
+                        convergio=False,
+                        historial_iteraciones=tuple(iteraciones))
 
 def integrar_trapecios(f: FuncionReal, a: float, b: float, n: int = 100) -> float:
     """Aproxima la integral definida de f en [a, b] con n trapecios compuestos.
@@ -137,9 +137,9 @@ def integrar_trapecios(f: FuncionReal, a: float, b: float, n: int = 100) -> floa
         ValueError: Si a >= b o n <= 0.
     """
     if a >= b or n <= 0:
-        raise ValueError("*a* debe ser estrictamente menor que b y *n* <= 0.")
+        raise ValueError("*a* debe ser estrictamente menor que b y *n* > 0.")
 
-    h: float = (b-a)/n 
+    h: float = (b-a)/n
     resultado_acumulado: float = (f(a)+f(b))/2
     for k in range(1, n):
         resultado_acumulado += f(a+(k*h))
