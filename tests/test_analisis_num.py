@@ -1,11 +1,10 @@
+"""Suite de tests unitarios para analisis_num.py (TP 2)."""
 import unittest
 import math
-import sympy
 from definiciones import(
     HipotesisDeBolzanoError,
     DerivadaNulaError,
     FuncionReal,
-    PasoIteracion,
     ResultadoRaiz,
 )
 from analisis_num import(

@@ -1,4 +1,4 @@
-"""Módulo TP 1: Algoritmos de Álgebra Lineal exacta y resolución de sistemas."""
+"""Módulo TP 1: Algoritmos de álgebra lineal exacta y resolución de sistemas."""
 
 from __future__ import annotations
 from collections.abc import Sequence

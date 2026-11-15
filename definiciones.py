@@ -117,3 +117,32 @@ class ResultadoRaiz:
     iteraciones_realizadas: int
     convergio: bool
     historial_iteraciones: tuple[PasoIteracion, ...]
+
+
+class TipoExtremo(Enum):
+    """Clasificación de un punto crítico según el criterio de la segunda derivada."""
+
+    MINIMO_LOCAL = "Mínimo Local"
+    MAXIMO_LOCAL = "Máximo Local"
+    PUNTO_INFLEXION_O_DEGENERADO = "Punto de Inflexión o Degenerado"
+
+
+@dataclass(frozen=True)
+class PuntoCritico:
+    """Representa un punto donde f'(x) = 0 junto con su clasificación."""
+
+    x: float
+    valor_f: float
+    segunda_derivada: float
+    clasificacion: TipoExtremo
+
+
+@dataclass(frozen=True)
+class ReporteFuncion:
+    """Reporte integral del estudio de una función simbólica en un intervalo [a, b]."""
+
+    derivada_primera: str
+    derivada_segunda: str
+    raices_aproximadas: tuple[float, ...]
+    puntos_criticos: tuple[PuntoCritico, ...]
+    integral_definida: float

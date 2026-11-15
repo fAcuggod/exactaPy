@@ -1,4 +1,4 @@
-"""Módulo TP 0: Implementación del TAD Matriz sobre el cuerpo de los racionales (Q)."""
+"""Módulo TP 0: Implementación del TAD matriz sobre el cuerpo de los racionales (Q)."""
 
 from __future__ import annotations
 from collections.abc import Sequence
