@@ -119,7 +119,7 @@ class Suma(Expresion):
         return self.izq.evaluar(valor_x) + self.der.evaluar(valor_x)
 
     def derivar(self) -> Expresion:
-        return self.izq.derivar() + self.izq.derivar()
+        return self.izq.derivar() + self.der.derivar()
 
     def simplificar(self) -> Expresion:
         izq_simp: Expresion = self.izq.simplificar()
@@ -378,8 +378,9 @@ def _buscar_ceros_en_intervalo(
         x_der: float = a + (i + 1) * h
         f_izq: float = expr.evaluar(x_izq)
         f_der: float = expr.evaluar(x_der)
+        candidato: float | None = None
         if abs(f_izq) <= tol:
-            raices.append(x_izq)
+            candidato = x_izq
 
         elif f_izq * f_der < 0:
             candidato = biseccion_bolzano(expr.evaluar, x_izq, x_der, tol).raiz_aproximada

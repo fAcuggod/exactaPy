@@ -19,122 +19,229 @@ from expresiones import (
     Variable,
     analizar_funcion_en_intervalo,
     polinomio_taylor,
+    _asegurar_expresion,
+    _buscar_ceros_en_intervalo,
 )
 
-def test_evaluar_nodos_basicos() -> None:
-    x = Variable("x")
-    # TODO: Instanciar y evaluar Constante, Variable, Suma, Producto, Cociente, Potencia
-    # y verificar resultados con pytest.approx(...)
-    pass
+class TestEvaluarNodos(unittest.TestCase):
+
+    def test_evaluar_nodos_basicos(self) -> None:
+        x = Variable("x")
+        expr: Expresion = _asegurar_expresion(6.0)
+        expr_2: Expresion = x ** 2 - 2 * x
+        expr_3: Expresion = 5 * x
+        self.assertEqual(isinstance(expr, Constante), True)
+        self.assertEqual(isinstance(_asegurar_expresion(expr_2), Expresion), True)
+
+        with self.assertRaises(TypeError):
+            _asegurar_expresion(str(x + 3))
+
+        self.assertEqual(x.derivar(), Constante(1.0))
+        self.assertEqual(x.simplificar(), x)
+        self.assertEqual(
+            Suma(x.evaluar(Constante(1.0)), Constante(2.0)).simplificar(),
+            Constante(3.0)
+            )
+        self.assertEqual(
+            Suma(x.evaluar(Constante(10.0)), Constante(0.0)).simplificar(),
+            Constante(10.0)
+        )
+        self.assertEqual(
+            Suma(
+                Constante(6.0), Producto(Constante(-1.0), x.evaluar(Constante(1.0)))).simplificar(),
+            Constante(5.0)
+        )
+        self.assertEqual(
+            Producto(x.evaluar(Constante(5.0)), x.evaluar(Constante(0.0))).simplificar(),
+            Constante(0.0)
+            )
+        self.assertEqual(
+            Suma(expr_2.evaluar(0.0), expr_2.evaluar(1.0)),
+            Suma(0.0, -1.0)
+        )
+        self.assertEqual(
+            Suma(expr_3.derivar().simplificar(), expr_3.derivar().simplificar()),
+            Suma(Constante(5.0), Constante(5.0))
+        )
+        self.assertEqual(
+            Suma(Variable('x'), Constante(2.0)).derivar(),
+            Suma(Constante(1.0), Constante(0.0))
+        )
+        self.assertEqual(
+            Suma(Constante(0.0), Variable('x')).simplificar(),
+            Variable('x')
+        )
+        self.assertEqual(
+            Suma(Variable('x'), Constante(0.0)).simplificar(),
+            Variable('x')
+        )
+        self.assertEqual(
+            Suma(Variable('x'), Constante(2.0)).simplificar(),
+            Suma(Variable('x'), Constante(2.0))
+        )
+        self.assertEqual(
+            Producto(Producto(Variable('x'), Constante(1.0)),
+                     Producto(Constante(1.0), Variable('x'))).simplificar(),
+            Producto(Variable('x'), Variable('x'))
+        )
+        self.assertEqual(
+            str(Producto((Constante(4.0)), Constante(1.0))),
+            "(4 * 1)"
+        )
+
+        c: Constante = Constante(5.0)
+        c_decimal: Constante = Constante(2.5)
+        self.assertEqual(c.evaluar(99.0), 5.0)
+        self.assertEqual(c.derivar(), Constante(0.0))
+        self.assertEqual(str(c_decimal), "2.5")
+
+    def test_cociente_completo(self) -> None:
+        x = Variable("x")
+
+        self.assertAlmostEqual(Cociente(x, Constante(2.0)).evaluar(6.0), 3.0)
+        with self.assertRaises(ZeroDivisionError):
+            Cociente(x, Constante(0.0)).evaluar(2.0)
+
+        self.assertAlmostEqual(Cociente(x, x + Constante(1.0)).derivar().evaluar(1.0), 0.25)
+
+        with self.assertRaises(ZeroDivisionError):
+            Cociente(x, Constante(0.0)).simplificar()
+        self.assertEqual(Cociente(Constante(6.0), Constante(2.0)).simplificar(), Constante(3.0))
+        self.assertEqual(Cociente(Constante(0.0), x).simplificar(), Constante(0.0))
+        self.assertEqual(Cociente(x, Constante(1.0)).simplificar(), x)
+        self.assertEqual(
+            Cociente(x, x + Constante(2.0)).simplificar(), Cociente(x, x + Constante(2.0)))
+
+        self.assertEqual(str(Cociente(x, Constante(2.0))), "(x / 2)")
+
+    def test_potencia_completa(self) -> None:
+        x = Variable("x")
+
+        self.assertAlmostEqual(Potencia(x, 3.0).evaluar(2.0), 8.0)
+
+        self.assertEqual(Potencia(x, 0.0).derivar(), Constante(0.0))
+        self.assertAlmostEqual(Potencia(x, 3.0).derivar().evaluar(2.0), 12.0)
+
+        self.assertEqual(Potencia(x, 0.0).simplificar(), Constante(1.0))
+        self.assertEqual(Potencia(x, 1.0).simplificar(), x)
+        self.assertEqual(Potencia(Constante(3.0), 2.0).simplificar(), Constante(9.0))
+        self.assertEqual(Potencia(x, 2.0).simplificar(), Potencia(x, 2.0))
+
+        self.assertEqual(str(Potencia(x, 2.0)), "(x ^ 2)")
+        self.assertEqual(str(Potencia(x, 0.5)), "(x ^ 0.5)")
+
+    def test_evaluar_nodos_trascendentes(self) -> None:
+        x = Variable("x")
+        arg: Expresion = x
+        arg_2: Expresion = (2 / 4) * x
+        arg_3: Expresion = (0 / x) * 1
+        arg_4: Expresion = 2 * x
+
+        self.assertAlmostEqual(Seno(arg).evaluar(math.pi), 0.0, places=7)
+        self.assertAlmostEqual(Seno(arg).derivar().evaluar(math.pi), -1.0)
+        self.assertEqual(Seno(arg_2).simplificar(), Seno((1 / 2) * x))
+        self.assertEqual(Seno(arg_3).simplificar(), Constante(math.sin(0.0)))
+        self.assertEqual(str(Seno(arg)), "sin(x)")
+
+        self.assertAlmostEqual(Coseno(arg).derivar().evaluar(math.pi), 0.0, places=7)
+        self.assertEqual(Coseno(arg_2).simplificar(), Coseno((1 / 2) * x))
+        self.assertEqual(Coseno(arg_3).simplificar(), Constante(math.cos(0.0)))
+        self.assertEqual(str(Coseno(arg)), "cos(x)")
+
+        self.assertEqual(Exponencial(arg).evaluar(0.0), 1.0)
+        self.assertEqual(Exponencial(arg).derivar().simplificar(), Exponencial(arg))
+        self.assertEqual(
+            Exponencial((3 / x).evaluar(Constante(1.0))).simplificar(),
+            Constante(math.exp(3.0))
+            )
+        self.assertEqual(str(Exponencial(arg)), "exp(x)")
+
+        self.assertEqual(Logaritmo(arg).evaluar(1.0), 0.0)
+        with self.assertRaises(ValueError):
+            Logaritmo(arg).evaluar(0.0)
+        self.assertEqual(
+            Logaritmo(arg_4).derivar().simplificar(),
+            Cociente(Constante(2.0), Producto(Constante(2.0), x))
+            )
+        self.assertEqual(Logaritmo(Constante(1.0)).simplificar(), Constante(0.0))
+        with self.assertRaises(ValueError):
+            Logaritmo(Constante(-1.0)).simplificar()
+        self.assertEqual(Logaritmo(x).simplificar(), Logaritmo(x))
+        self.assertEqual(str(Logaritmo(arg)),"ln(x)")
+
+    def test_sobrecarga_operadores_y_radd_rmul_rsub_rtruediv(self) -> None:
+        x = Variable("x")
+        self.assertEqual(6.0 + Constante(5.0), Suma(Constante(6.0), Constante(5.0)))
+        self.assertEqual(4.0 - x, Suma(Constante(4.0), Producto(Constante(-1.0), x)))
+        self.assertEqual(x * 2, Producto(x, Constante(2)))
+        self.assertEqual(-x / 1, Cociente(Producto(Constante(-1.0), x), Constante(1.0)))
+        self.assertEqual(1 / x, Cociente(Constante(1.0), x))
 
 
-def test_evaluar_nodos_trascendentes() -> None:
-    x = Variable("x")
-    # TODO: Evaluar Seno, Coseno, Exponencial y Logaritmo en puntos conocidos
-    pass
+class TestPolinomioDeTaylor(unittest.TestCase):
+
+    def test_orden_menor_que_cero(self):
+        with self.assertRaises(ValueError):
+            polinomio_taylor(lambda x: 2 * x, 1.0, -3)
+
+    def test_taylor_orden_3(self):        
+        x = Variable("x")
+        expr: Expresion = 2 * (x ** 3)
+        expr_taylor: Expresion = polinomio_taylor(expr, 0, 3)
+        self.assertEqual(expr_taylor, expr)
 
 
-def test_sobrecarga_operadores_y_radd_rmul_rsub_rtruediv() -> None:
-    x = Variable("x")
-    # TODO: Probar combinaciones con números a izquierda y derecha:
-    # ej: expr = 2.0 + x - 1.0 + (3.0 * x) / (2.0 / x) + (-x) + (x ** 2)
-    # para cubrir __add__, __radd__, __sub__, __rsub__, __mul__, __rmul__,
-    # __truediv__, __rtruediv__, __neg__ y __pow__.
-    pass
+class TestAnalizarFuncionEnIntervalo(unittest.TestCase):
 
+    def test_raices_sin_intervalo_cerrado(self):
+        x: Variable = Variable('x')
+        raices: list[float] = _buscar_ceros_en_intervalo(
+            Seno(x), -1.0, 6.5, 100, 1e-7
+        )
+        raices_cheq: list[float] = [0, math.pi, 2 * math.pi]
 
-def test_str_todas_las_clases() -> None:
-    x = Variable("x")
-    # TODO: Llamar a str(...) sobre una expresión que contenga todos los nodos
-    # (incluyendo Constante entera como 2.0 y decimal como 2.5, y Potencia entera/decimal)
-    pass
+        for i in range(len(raices_cheq)):
+            self.assertAlmostEqual(raices[i], raices_cheq[i], places=6)
 
+    def test_raices_exactas_en_nodos_y_extremo_derecho(self) -> None:
+        x: Variable = Variable("x")
+        expr: Expresion = (x ** 2) - Constante(1.0)
+        raices: list[float] = _buscar_ceros_en_intervalo(
+            expr, -1.0, 1.0, 10, 1e-7
+        )
+        self.assertEqual(len(raices), 2)
+        self.assertAlmostEqual(raices[0], -1.0, places=7)
+        self.assertAlmostEqual(raices[1], 1.0, places=7)
 
-def test_errores_dominio_evaluar() -> None:
-    x = Variable("x")
-    # TODO:
-    # 1. Cociente con denominador 0 -> with pytest.raises(ZeroDivisionError):
-    # 2. Logaritmo con argumento <= 0 -> with pytest.raises(ValueError):
-    # 3. Variable con nombre distinto de "x" (si aplica)
-    pass
+    def test_analizar_funcion_en_intervalo_completo(self) -> None:
+        x: Variable = Variable("x")
+        expr: Expresion = (x ** 5) - (Constante(5.0) / Constante(3.0)) * (x ** 3)
 
+        reporte: ReporteFuncion = analizar_funcion_en_intervalo(
+            expr, a=-2.0, b=2.0, subintervalos=40, tol=1e-7
+        )
+        self.assertEqual(len(reporte.puntos_criticos), 3)
+        self.assertAlmostEqual(reporte.puntos_criticos[0].x, -1.0, places=6)
+        self.assertEqual(
+            reporte.puntos_criticos[0].clasificacion,
+            TipoExtremo.MAXIMO_LOCAL,
+        )
+        self.assertAlmostEqual(reporte.puntos_criticos[1].x, 0.0, places=6)
+        self.assertEqual(
+            reporte.puntos_criticos[1].clasificacion,
+            TipoExtremo.PUNTO_INFLEXION_O_DEGENERADO,
+        )
+        self.assertAlmostEqual(reporte.puntos_criticos[2].x, 1.0, places=6)
+        self.assertEqual(
+            reporte.puntos_criticos[2].clasificacion,
+            TipoExtremo.MINIMO_LOCAL,
+        )
 
-def test_simplificar_suma() -> None:
-    x = Variable("x")
-    # TODO: Cubrir las 4 ramas de Suma.simplificar():
-    # 1. Constante + Constante -> Constante
-    # 2. 0 + x -> x
-    # 3. x + 0 -> x
-    # 4. x + x -> Suma(x, x)
-    pass
-
-
-def test_simplificar_producto() -> None:
-    x = Variable("x")
-    # TODO: Cubrir las 5 ramas de Producto.simplificar():
-    # 1. Constante * Constante -> Constante
-    # 2. 0 * x  y  x * 0 -> Constante(0.0)
-    # 3. 1 * x -> x
-    # 4. x * 1 -> x
-    # 5. x * x -> Producto(x, x)
-    pass
-
-
-def test_simplificar_cociente() -> None:
-    x = Variable("x")
-    # TODO: Cubrir todas las ramas de Cociente.simplificar():
-    # 1. Denominador == 0 -> pytest.raises(ZeroDivisionError)
-    # 2. Constante / Constante -> Constante
-    # 3. 0 / x -> Constante(0.0)
-    # 4. x / 1 -> x
-    # 5. x / (x + 2) -> Cociente(...)
-    pass
-
-
-def test_simplificar_potencia_y_unarios() -> None:
-    x = Variable("x")
-    # TODO:
-    # - Potencia: x**0 -> 1, x**1 -> x, Constante(3)**2 -> Constante(9), x**2 -> Potencia(x, 2)
-    # - Seno, Coseno, Exponencial, Logaritmo:
-    #   * Con argumento Constante (pliega a Constante)
-    #   * Con argumento Variable (se mantiene el nodo)
-    #   * Logaritmo(Constante(-1)).simplificar() -> pytest.raises(ValueError)
-    pass
-
-
-def test_derivar_con_oraculo_sympy() -> None:
-    x_sym = sp.Symbol("x")
-    x = Variable("x")
-
-    # Ejemplo de cómo comparar tu derivador contra SymPy en varios puntos x0:
-    # expr_tuya = Seno(x ** 2) + Exponencial(3 * x) * Coseno(x) + Logaritmo(x) / x
-    # expr_sympy = sp.sin(x_sym ** 2) + sp.exp(3 * x_sym) * sp.cos(x_sym) + sp.log(x_sym) / x_sym
-    # df_tuya = expr_tuya.derivar().simplificar()
-    # df_sympy = sp.diff(expr_sympy, x_sym)
-    # for val in [0.5, 1.0, 2.0]:
-    #     assert df_tuya.evaluar(val) == pytest.approx(float(df_sympy.subs(x_sym, val)))
-    pass
-
-
-def test_derivar_casos_borde() -> None:
-    x = Variable("x")
-    # TODO: Cubrir Potencia con exp == 0.0 (ej. Potencia(x, 0.0).derivar() == Constante(0.0))
-    pass
-
-
-def test_polinomio_taylor() -> None:
-    x = Variable("x")
-    # TODO:
-    # 1. Caso del enunciado: Coseno(x) centrado en x0=0.0, orden=2 evaluated en 0.5 -> 0.875
-    # 2. Caso de error: orden < 0 -> with pytest.raises(ValueError):
-    pass
-
-
-def test_analizar_funcion_en_intervalo() -> None:
-    x = Variable("x")
-    # TODO:
-    # 1. Función con mínimo, máximo y raíces en el interior y en los bordes (ej. x**3 - 3*x en [-2, 2])
-    # 2. Función con punto de inflexión degenerado (ej. x**3 en [-1, 1] -> f'(0)=0 y f''(0)=0)
-    # 3. Función con raíz exactamente en el extremo derecho b (ej. x - 2 en [0, 2])
-    # 4. Caso de error: a >= b, subintervalos <= 0 o tol <= 0 -> with pytest.raises(ValueError):
-    pass
+    def test_analizar_funcion__value_error(self) -> None:
+        x: Variable = Variable("x")
+        with self.assertRaises(ValueError):
+            analizar_funcion_en_intervalo(x, a=2.0, b=1.0)
+        with self.assertRaises(ValueError):
+            analizar_funcion_en_intervalo(x, a=0, b=1, tol=-1)
+        with self.assertRaises(ValueError):
+            analizar_funcion_en_intervalo(x, a=0, b=1, subintervalos=-1)
