@@ -122,5 +122,10 @@ class TestMatrizAlgebraYOperaciones(unittest.TestCase):
         with self.assertRaises(DimensionesIncompatiblesError):
             _ = a.ampliar_columna(columna)
 
+    def test_to_latex(self) -> None:
+        m = Matriz([[1, "3/2"], ["-1/4", -2]])
+        esperado = r"\begin{pmatrix} 1 & \frac{3}{2} \\ \frac{-1}{4} & -2 \end{pmatrix}"
+        self.assertEqual(m.to_latex(), esperado)
+
 if __name__ == "__main__":
     unittest.main()

@@ -21,6 +21,10 @@ class Expresion(ABC):
     """Clase base abstracta para el árbol de sintaxis abstracta (AST) simbólico."""
 
     @abstractmethod
+    def to_latex(self) -> str:
+        """Devuelve la expresión formateada en código LaTeX."""
+
+    @abstractmethod
     def evaluar(self, valor_x: float) -> float:
         """Evalúa numéricamente la expresión reemplazando la variable por valor_x."""
 
@@ -67,12 +71,14 @@ class Expresion(ABC):
     def __neg__(self) -> Expresion:
         return Producto(Constante(-1.0), self)
 
-
 @dataclass(frozen=True)
 class Constante(Expresion):
     """Representa una constante real c."""
 
     valor: float
+
+    def to_latex(self) -> str:
+        return str(self)
 
     def evaluar(self, valor_x: float) -> float:
         return self.valor
@@ -95,6 +101,9 @@ class Variable(Expresion):
 
     nombre: str = "x"
 
+    def to_latex(self) -> str:
+        return self.nombre
+
     def evaluar(self, valor_x: float) -> float:
         return valor_x
 
@@ -114,6 +123,9 @@ class Suma(Expresion):
 
     izq: Expresion
     der: Expresion
+
+    def to_latex(self) -> str:
+        return f"{self.izq.to_latex()} + {self.der.to_latex()}"
 
     def evaluar(self, valor_x: float) -> float:
         return self.izq.evaluar(valor_x) + self.der.evaluar(valor_x)
@@ -146,6 +158,9 @@ class Producto(Expresion):
 
     izq: Expresion
     der: Expresion
+
+    def to_latex(self) -> str:
+        return f"{self.izq.to_latex()} \\cdot {self.der.to_latex()}"
 
     def evaluar(self, valor_x: float) -> float:
         return self.izq.evaluar(valor_x) * self.der.evaluar(valor_x)
@@ -181,6 +196,9 @@ class Cociente(Expresion):
 
     num: Expresion
     den: Expresion
+
+    def to_latex(self) -> str:
+        return f"\\frac{{{self.num.to_latex()}}}{{{self.den.to_latex()}}}"
 
     def evaluar(self, valor_x: float) -> float:
         den_val: float = self.den.evaluar(valor_x)
@@ -220,6 +238,10 @@ class Potencia(Expresion):
     base: Expresion
     exp: float
 
+    def to_latex(self) -> str:
+        exp_str = str(int(self.exp)) if self.exp.is_integer() else str(self.exp)
+        return f"{{{self.base.to_latex()}}}^{{{exp_str}}}"
+
     def evaluar(self, valor_x: float) -> float:
         base_val: float = self.base.evaluar(valor_x)
         return float(base_val ** self.exp)
@@ -254,6 +276,9 @@ class Seno(Expresion):
 
     arg: Expresion
 
+    def to_latex(self) -> str:
+        return f"\\sin\\left({self.arg.to_latex()}\\right)"
+
     def evaluar(self, valor_x: float) -> float:
         arg_val: float = self.arg.evaluar(valor_x)
         return math.sin(arg_val)
@@ -276,6 +301,9 @@ class Coseno(Expresion):
     """Representa cos(arg)."""
 
     arg: Expresion
+
+    def to_latex(self) -> str:
+        return f"\\cos\\left({self.arg.to_latex()}\\right)"
 
     def evaluar(self, valor_x: float) -> float:
         arg_val: float = self.arg.evaluar(valor_x)
@@ -300,6 +328,9 @@ class Exponencial(Expresion):
 
     arg: Expresion
 
+    def to_latex(self) -> str:
+        return f"\\exp\\left({self.arg.to_latex()}\\right)"
+
     def evaluar(self, valor_x: float) -> float:
         arg_val: float = self.arg.evaluar(valor_x)
         return math.exp(arg_val)
@@ -322,6 +353,9 @@ class Logaritmo(Expresion):
     """Representa ln(arg)."""
 
     arg: Expresion
+
+    def to_latex(self) -> str:
+        return f"\\ln\\left({self.arg.to_latex()}\\right)"
 
     def evaluar(self, valor_x: float) -> float:
         arg_val: float = self.arg.evaluar(valor_x)

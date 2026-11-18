@@ -2,9 +2,8 @@
 
 import math
 import unittest
-import sympy as sp
 
-from definiciones import PuntoCritico, ReporteFuncion, TipoExtremo
+from definiciones import ReporteFuncion, TipoExtremo
 from expresiones import (
     Cociente,
     Constante,
@@ -177,6 +176,26 @@ class TestEvaluarNodos(unittest.TestCase):
         self.assertEqual(-x / 1, Cociente(Producto(Constante(-1.0), x), Constante(1.0)))
         self.assertEqual(1 / x, Cociente(Constante(1.0), x))
 
+    def test_to_latex_todas_las_expresiones(self) -> None:
+        x = Variable("x")
+
+        self.assertEqual(Constante(3.0).to_latex(), "3")
+        self.assertEqual(Constante(2.5).to_latex(), "2.5")
+        self.assertEqual(x.to_latex(), "x")
+
+        self.assertEqual(Suma(x, Constante(2.0)).to_latex(), "x + 2")
+        self.assertEqual(Producto(Constante(3.0), x).to_latex(), r"3 \cdot x")
+        self.assertEqual(
+            Cociente(x, Suma(x, Constante(1.0))).to_latex(),
+            r"\frac{x}{x + 1}",
+        )
+        self.assertEqual(Potencia(x, 2.0).to_latex(), r"\left(x\right)^{2}")
+        self.assertEqual(Potencia(x, 0.5).to_latex(), r"\left(x\right)^{0.5}")
+
+        self.assertEqual(Seno(x).to_latex(), r"\sin\left(x\right)")
+        self.assertEqual(Coseno(x).to_latex(), r"\cos\left(x\right)")
+        self.assertEqual(Exponencial(x).to_latex(), r"e^{x}")
+        self.assertEqual(Logaritmo(x).to_latex(), r"\ln\left(x\right)")
 
 class TestPolinomioDeTaylor(unittest.TestCase):
 

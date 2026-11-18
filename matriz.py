@@ -336,3 +336,18 @@ class Matriz:
             fila_ampliada.append(b[i])
             grilla_nueva.append(fila_ampliada)
         return Matriz(grilla_nueva)
+
+    def to_latex(self) -> str:
+        """Devuelve la representación de la matriz en código LaTeX (entorno pmatrix)."""
+        filas_latex: list[str] = []
+        for i in range(self.filas):
+            celdas: list[str] = []
+            for j in range(self.columnas):
+                val: Fraction = self[i, j]
+                if val.denominator == 1:
+                    celdas.append(str(val.numerator))
+                else:
+                    celdas.append(f"\\frac{{{val.numerator}}}{{{val.denominator}}}")
+            filas_latex.append(" & ".join(celdas))
+        cuerpo: str = " \\\\ ".join(filas_latex)
+        return f"\\begin{{pmatrix}} {cuerpo} \\end{{pmatrix}}"
