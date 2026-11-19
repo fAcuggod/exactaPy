@@ -1,13 +1,13 @@
 """Suite de tests unitarios para analisis_num.py (TP 2)."""
 import unittest
 import math
-from definiciones import(
+from exactapy_core.definiciones import(
     HipotesisDeBolzanoError,
     DerivadaNulaError,
     FuncionReal,
     ResultadoRaiz,
 )
-from analisis_num import(
+from exactapy_core.analisis_num import(
     derivada_numerica,
     biseccion_bolzano,
     newton_raphson,

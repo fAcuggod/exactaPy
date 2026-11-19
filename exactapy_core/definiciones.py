@@ -75,7 +75,7 @@ class OperacionElemental:
     factor: Escalar | None = None
 
 if TYPE_CHECKING:
-    from matriz import Matriz
+    from exactapy_core.matriz import Matriz
 
 
 @dataclass(frozen=True)

@@ -3,7 +3,7 @@
 from __future__ import annotations
 from collections.abc import Sequence
 from fractions import Fraction
-from definiciones import (
+from exactapy_core.definiciones import (
     ClasificacionSistema,
     EntradaEscalar,
     Escalar,
@@ -15,7 +15,7 @@ from definiciones import (
     MatrizNoCuadradaError,
     MatrizSingularError
 )
-from matriz import Matriz
+from exactapy_core.matriz import Matriz
 
 
 def escalonar_gauss_jordan(a: Matriz) -> ResultadoEscalonamiento:

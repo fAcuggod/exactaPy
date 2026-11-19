@@ -5,8 +5,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import math
-from definiciones import PuntoCritico, ReporteFuncion, TipoExtremo
-from analisis_num import biseccion_bolzano, integrar_simpson
+from exactapy_core.definiciones import PuntoCritico, ReporteFuncion, TipoExtremo
+from exactapy_core.analisis_num import biseccion_bolzano, integrar_simpson
 
 def _asegurar_expresion(valor: Expresion | float | int) -> Expresion:
     """Convierte números reales/enteros en nodos constante automáticamente."""

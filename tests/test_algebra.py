@@ -3,7 +3,7 @@
 import unittest
 from fractions import Fraction
 import sympy as sp  # type: ignore[import-untyped]
-from algebra import (
+from exactapy_core.algebra import (
     base_imagen,
     base_nucleo,
     determinante,
@@ -12,14 +12,14 @@ from algebra import (
     rango,
     resolver_sistema,
 )
-from definiciones import (
+from exactapy_core.definiciones import (
     ClasificacionSistema,
     DimensionesIncompatiblesError,
     MatrizNoCuadradaError,
     MatrizSingularError,
     Vector,
 )
-from matriz import Matriz
+from exactapy_core.matriz import Matriz
 
 
 def a_sympy(m: Matriz) -> sp.Matrix:

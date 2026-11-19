@@ -3,7 +3,7 @@
 from __future__ import annotations
 from collections.abc import Sequence
 from fractions import Fraction
-from definiciones import (
+from exactapy_core.definiciones import (
     DimensionesIncompatiblesError,
     EntradaEscalar,
     Escalar,

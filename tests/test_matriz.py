@@ -2,8 +2,8 @@
 
 import unittest
 from fractions import Fraction
-from definiciones import DimensionesIncompatiblesError
-from matriz import Matriz
+from exactapy_core.definiciones import DimensionesIncompatiblesError
+from exactapy_core.matriz import Matriz
 
 
 class TestMatrizCreacionEIndexacion(unittest.TestCase):

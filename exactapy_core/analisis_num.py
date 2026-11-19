@@ -1,7 +1,7 @@
 """Módulo TP 2: Métodos numéricos de análisis matemático I y funciones de orden superior."""
 
 from __future__ import annotations
-from definiciones import (
+from exactapy_core.definiciones import (
     DerivadaNulaError,
     FuncionReal,
     HipotesisDeBolzanoError,

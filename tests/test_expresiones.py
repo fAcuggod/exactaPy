@@ -3,8 +3,8 @@
 import math
 import unittest
 
-from definiciones import ReporteFuncion, TipoExtremo
-from expresiones import (
+from exactapy_core.definiciones import ReporteFuncion, TipoExtremo
+from exactapy_core.expresiones import (
     Cociente,
     Constante,
     Coseno,
@@ -189,12 +189,12 @@ class TestEvaluarNodos(unittest.TestCase):
             Cociente(x, Suma(x, Constante(1.0))).to_latex(),
             r"\frac{x}{x + 1}",
         )
-        self.assertEqual(Potencia(x, 2.0).to_latex(), r"\left(x\right)^{2}")
-        self.assertEqual(Potencia(x, 0.5).to_latex(), r"\left(x\right)^{0.5}")
+        self.assertEqual(Potencia(x, 2.0).to_latex(), r"{x}^{2}")
+        self.assertEqual(Potencia(x, 0.5).to_latex(), r"{x}^{0.5}")
 
         self.assertEqual(Seno(x).to_latex(), r"\sin\left(x\right)")
         self.assertEqual(Coseno(x).to_latex(), r"\cos\left(x\right)")
-        self.assertEqual(Exponencial(x).to_latex(), r"e^{x}")
+        self.assertEqual(Exponencial(x).to_latex(), r"\exp\left(x\right)")
         self.assertEqual(Logaritmo(x).to_latex(), r"\ln\left(x\right)")
 
 class TestPolinomioDeTaylor(unittest.TestCase):

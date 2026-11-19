@@ -6,10 +6,10 @@ from rich.panel import Panel
 from rich.prompt import FloatPrompt, IntPrompt, Prompt
 from rich.table import Table
 
-from algebra import base_nucleo, escalonar_gauss_jordan, resolver_sistema
-from analisis_num import biseccion_bolzano, integrar_simpson
-from definiciones import ExactaPyError
-from expresiones import (
+from exactapy_core.algebra import base_nucleo, escalonar_gauss_jordan, resolver_sistema
+from exactapy_core.analisis_num import biseccion_bolzano, integrar_simpson
+from exactapy_core.definiciones import ExactaPyError
+from exactapy_core.expresiones import (
     Constante,
     Coseno,
     Exponencial,
@@ -20,7 +20,7 @@ from expresiones import (
     analizar_funcion_en_intervalo,
     polinomio_taylor,
 )
-from matriz import Matriz
+from exactapy_core.matriz import Matriz
 
 console = Console()
 
