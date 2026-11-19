@@ -17,6 +17,8 @@ from exactapy_core.expresiones import (
 )
 from exactapy_core.matriz import Matriz
 from exactapy_core.parser import parsear_expresion
+import os
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(
     title="ExactaPy API",
@@ -160,3 +162,6 @@ def endpoint_estudio_funcion(req: EstudioFuncionRequest) -> dict[str, Any]:
         }
     except (ValueError, ZeroDivisionError, ExactaPyError) as err:
         raise HTTPException(status_code=400, detail=str(err)) from err
+
+if os.path.isdir("public"):
+    app.mount("/", StaticFiles(directory="public", html=True), name="static")

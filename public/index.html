@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ExactaPy - Álgebra Lineal y Análisis I</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+
+  <link rel="stylesheet" href="/styles.css" />
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>ExactaPy</h1>
+        <p>Álgebra Lineal &amp; Análisis I</p>
+      </div>
+
+      <nav class="nav">
+        <span class="nav-group">Álgebra Lineal (ℚ)</span>
+        <button class="nav-item active" data-tab="gauss">Gauss-Jordan y Núcleo</button>
+        <button class="nav-item" data-tab="sistema">Sistemas Lineales (Ax = b)</button>
+
+        <span class="nav-group">Análisis Matemático I</span>
+        <button class="nav-item" data-tab="funcion">Estudio de Función &amp; Taylor</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span id="api-status" class="status-dot">Verificando motor...</span>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <div id="error-banner" class="error-banner hidden"></div>
+
+      <section id="tab-gauss" class="panel-section">
+        <header class="section-header">
+          <h2>Eliminación de Gauss-Jordan y Núcleo</h2>
+          <p>Aritmética exacta sobre ℚ. Podés ingresar enteros o fracciones (ej. <code>3/2</code>, <code>-1/4</code>).</p>
+        </header>
+
+        <div class="card">
+          <div class="controls-row">
+            <label>Filas <input id="gj-rows" type="number" min="1" max="8" value="3" /></label>
+            <label>Columnas <input id="gj-cols" type="number" min="1" max="8" value="3" /></label>
+            <button id="gj-resize" class="btn-secondary" type="button">Actualizar grilla</button>
+          </div>
+          <div id="gj-grid" class="matrix-grid"></div>
+          <div class="actions-row">
+            <button id="gj-run" class="btn-primary" type="button">Calcular RREF y Núcleo</button>
+          </div>
+        </div>
+
+        <div id="gj-result" class="results hidden">
+          <div class="result-grid-2">
+            <div class="card">
+              <div class="card-header">
+                <h3>Matriz Original (A)</h3>
+                <button class="btn-copy" data-copy-target="gj-orig-raw">Copiar LaTeX</button>
+              </div>
+              <div id="gj-orig-latex" class="math-box"></div>
+              <input type="hidden" id="gj-orig-raw" />
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h3>Forma Escalonada Reducida (RREF)</h3>
+                <button class="btn-copy" data-copy-target="gj-rref-raw">Copiar LaTeX</button>
+              </div>
+              <div id="gj-rref-latex" class="math-box"></div>
+              <input type="hidden" id="gj-rref-raw" />
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Propiedades y Subespacio</h3>
+            <div id="gj-meta" class="meta-list"></div>
+          </div>
+
+          <div class="card">
+            <h3>Traza de Operaciones Elementales</h3>
+            <ol id="gj-pasos" class="steps-list"></ol>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-sistema" class="panel-section hidden">
+        <header class="section-header">
+          <h2>Resolución de Sistemas Lineales (Ax = b)</h2>
+          <p>Clasificación por Rouché-Frobenius, solución particular y base del sistema homogéneo asociado.</p>
+        </header>
+
+        <div class="card">
+          <div class="controls-row">
+            <label>Ecuaciones (filas) <input id="sis-rows" type="number" min="1" max="8" value="3" /></label>
+            <label>Incógnitas (cols) <input id="sis-cols" type="number" min="1" max="8" value="3" /></label>
+            <button id="sis-resize" class="btn-secondary" type="button">Actualizar grilla</button>
+          </div>
+          <div class="system-grids">
+            <div>
+              <span class="grid-label">Matriz de coeficientes A</span>
+              <div id="sis-grid-a" class="matrix-grid"></div>
+            </div>
+            <div>
+              <span class="grid-label">Vector b</span>
+              <div id="sis-grid-b" class="matrix-grid"></div>
+            </div>
+          </div>
+          <div class="actions-row">
+            <button id="sis-run" class="btn-primary" type="button">Resolver Sistema</button>
+          </div>
+        </div>
+
+        <div id="sis-result" class="results hidden">
+          <div class="card">
+            <div class="card-header">
+              <h3>Clasificación y Conjunto Solución</h3>
+              <span id="sis-badge" class="badge"></span>
+            </div>
+            <div id="sis-solucion" class="meta-list"></div>
+          </div>
+
+          <div class="card">
+            <h3>Traza de Operaciones Elementales</h3>
+            <ol id="sis-pasos" class="steps-list"></ol>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-funcion" class="panel-section hidden">
+        <header class="section-header">
+          <h2>Estudio Analítico de Función y Polinomio de Taylor</h2>
+          <p>Soporta polinomios, potencias y funciones: <code>sin</code>, <code>cos</code>, <code>exp</code>, <code>ln</code>, <code>sqrt</code>, <code>pi</code>, <code>e</code>.</p>
+        </header>
+
+        <div class="card">
+          <div class="form-grid">
+            <label class="full-width">
+              Expresión f(x)
+              <input id="fn-expr" type="text" class="mono-input" value="x^3 - 3x" placeholder="Ej: x^3 - 3x + sin(x)" />
+            </label>
+            <label>Extremo a <input id="fn-a" type="number" step="0.5" value="-3" /></label>
+            <label>Extremo b <input id="fn-b" type="number" step="0.5" value="3" /></label>
+            <label>Centro Taylor x₀ <input id="fn-x0" type="number" step="0.5" value="0" /></label>
+            <label>Orden Taylor n <input id="fn-orden" type="number" min="0" max="10" value="3" /></label>
+          </div>
+          <div class="actions-row">
+            <button id="fn-run" class="btn-primary" type="button">Analizar y Graficar</button>
+          </div>
+        </div>
+
+        <div id="fn-result" class="results hidden">
+          <div class="card">
+            <h3>Derivadas Simbólicas y Polinomio de Taylor</h3>
+            <div class="formulas-stack">
+              <div class="formula-row">
+                <span class="formula-tag">f(x)</span>
+                <div id="fn-f-latex" class="math-inline"></div>
+                <button class="btn-copy" data-copy-target="fn-f-raw">Copiar LaTeX</button>
+                <input type="hidden" id="fn-f-raw" />
+              </div>
+              <div class="formula-row">
+                <span class="formula-tag">f'(x)</span>
+                <div id="fn-d1-latex" class="math-inline"></div>
+                <button class="btn-copy" data-copy-target="fn-d1-raw">Copiar LaTeX</button>
+                <input type="hidden" id="fn-d1-raw" />
+              </div>
+              <div class="formula-row">
+                <span class="formula-tag">f''(x)</span>
+                <div id="fn-d2-latex" class="math-inline"></div>
+                <button class="btn-copy" data-copy-target="fn-d2-raw">Copiar LaTeX</button>
+                <input type="hidden" id="fn-d2-raw" />
+              </div>
+              <div class="formula-row">
+                <span class="formula-tag">Pₙ(x)</span>
+                <div id="fn-taylor-latex" class="math-inline"></div>
+                <button class="btn-copy" data-copy-target="fn-taylor-raw">Copiar LaTeX</button>
+                <input type="hidden" id="fn-taylor-raw" />
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Gráfico en [a, b]</h3>
+            <div class="chart-wrap">
+              <canvas id="fn-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="result-grid-2">
+            <div class="card">
+              <h3>Raíces e Integral Definida</h3>
+              <div id="fn-resumen" class="meta-list"></div>
+            </div>
+            <div class="card">
+              <h3>Puntos Críticos</h3>
+              <table class="data-table">
+                <thead>
+                  <tr><th>x</th><th>f(x)</th><th>f''(x)</th><th>Clasificación</th></tr>
+                </thead>
+                <tbody id="fn-criticos"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
