@@ -1177,6 +1177,36 @@ input[type="text"]:focus {
   flex-wrap: wrap;
 }
 
+.footer-repo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  background: var(--surface-sub);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footer-repo-link:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.footer-repo-link:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.github-icon {
+  display: block;
+  flex-shrink: 0;
+}
+
 .hidden {
   display: none !important;
 }
