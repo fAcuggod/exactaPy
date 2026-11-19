@@ -2,10 +2,12 @@
 
 from fractions import Fraction
 import math
+import os
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, APIRouter
+from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from exactapy_core.algebra import base_nucleo, escalonar_gauss_jordan, resolver_sistema
@@ -17,8 +19,6 @@ from exactapy_core.expresiones import (
 )
 from exactapy_core.matriz import Matriz
 from exactapy_core.parser import parsear_expresion
-import os
-from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(
     title="ExactaPy API",
@@ -163,8 +163,15 @@ def endpoint_estudio_funcion(req: EstudioFuncionRequest) -> dict[str, Any]:
     except (ValueError, ZeroDivisionError, ExactaPyError) as err:
         raise HTTPException(status_code=400, detail=str(err)) from err
 
+# Vercel invoca la función con la ruta original (/api/...), pero se monta
+# también sin prefijo por si el runtime entrega la ruta ya recortada.
 app.include_router(router, prefix="/api")
 app.include_router(router)
 
-if os.path.isdir("public"):
-    app.mount("/", StaticFiles(directory="public", html=True), name="static")
+# En Vercel, public/ lo sirve la CDN: no se monta StaticFiles para que el
+# catch-all "/" nunca interfiera con el enrutamiento de la función.
+# Localmente (uvicorn) sí se sirve el frontend desde la misma app.
+_PUBLIC_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "public")
+
+if not os.environ.get("VERCEL") and os.path.isdir(_PUBLIC_DIR):
+    app.mount("/", StaticFiles(directory=_PUBLIC_DIR, html=True), name="static")
