@@ -4,7 +4,7 @@ from fractions import Fraction
 import math
 from typing import Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -77,13 +77,13 @@ def _muestrear_curva(expr: Expresion, a: float, b: float, puntos: int = 120) -> 
 
 
 
-@app.get("/api/health")
+router = APIRouter()
+
+@router.get("/health")
 def health_check() -> dict[str, str]:
-    """Verifica que el motor ExactaPy esté activo."""
     return {"status": "ok", "engine": "ExactaPy Core"}
 
-
-@app.post("/api/gauss-jordan")
+@router.post("/gauss-jordan")
 def endpoint_gauss_jordan(req: MatrizRequest) -> dict[str, Any]:
     try:
         matriz_a = _validar_matriz_y_construir(req.matriz)
@@ -102,7 +102,7 @@ def endpoint_gauss_jordan(req: MatrizRequest) -> dict[str, Any]:
         raise HTTPException(status_code=400, detail=str(err)) from err
 
 
-@app.post("/api/sistema")
+@router.post("/sistema")
 def endpoint_sistema(req: SistemaRequest) -> dict[str, Any]:
     try:
         matriz_a = _validar_matriz_y_construir(req.matriz_a)
@@ -126,7 +126,7 @@ def endpoint_sistema(req: SistemaRequest) -> dict[str, Any]:
         raise HTTPException(status_code=400, detail=str(err)) from err
 
 
-@app.post("/api/estudio-funcion")
+@router.post("/estudio-funcion")
 def endpoint_estudio_funcion(req: EstudioFuncionRequest) -> dict[str, Any]:
     try:
         if req.a >= req.b:
@@ -162,6 +162,9 @@ def endpoint_estudio_funcion(req: EstudioFuncionRequest) -> dict[str, Any]:
         }
     except (ValueError, ZeroDivisionError, ExactaPyError) as err:
         raise HTTPException(status_code=400, detail=str(err)) from err
+
+app.include_router(router, prefix="/api")
+app.include_router(router)
 
 if os.path.isdir("public"):
     app.mount("/", StaticFiles(directory="public", html=True), name="static")
