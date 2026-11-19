@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ExactaPy - Álgebra Lineal y Análisis I</title>
+  <title>ExactaPy — Cálculo Exacto: Álgebra Lineal y Análisis Matemático I</title>
+  <link rel="icon" type="image/png" href="/logo.png" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
@@ -18,201 +19,500 @@
   <script defer src="/app.js"></script>
 </head>
 <body>
-  <div class="layout">
-    <aside class="sidebar">
+  <header class="site-header">
+    <div class="container header-inner">
       <div class="brand">
-        <h1>ExactaPy</h1>
-        <p>Álgebra Lineal &amp; Análisis I</p>
+        <img src="/logo.png" alt="Logo de ExactaPy" class="brand-logo" width="46" height="46" />
+        <div class="brand-text">
+          <h1>ExactaPy</h1>
+          <p>Motor de Cálculo Exacto · Álgebra Lineal (ℚ) y Análisis Matemático I</p>
+        </div>
       </div>
 
-      <nav class="nav">
-        <span class="nav-group">Álgebra Lineal (ℚ)</span>
-        <button class="nav-item active" data-tab="gauss">Gauss-Jordan y Núcleo</button>
-        <button class="nav-item" data-tab="sistema">Sistemas Lineales (Ax = b)</button>
-
-        <span class="nav-group">Análisis Matemático I</span>
-        <button class="nav-item" data-tab="funcion">Estudio de Función &amp; Taylor</button>
-      </nav>
-
-      <div class="sidebar-footer">
-        <span id="api-status" class="status-dot">Verificando motor...</span>
+      <div class="header-meta">
+        <span id="api-status" class="status-pill status-checking">Verificando motor...</span>
       </div>
-    </aside>
+    </div>
+  </header>
 
-    <main class="workspace">
-      <div id="error-banner" class="error-banner hidden"></div>
+  <nav class="mode-bar" aria-label="Selección de herramienta matemática">
+    <div class="container">
+      <p class="mode-bar-label">1. Elegí el tipo de problema que querés resolver:</p>
+      <div class="mode-tabs" role="tablist">
+        <button class="nav-item active" type="button" role="tab" aria-selected="true" data-tab="gauss">
+          <span class="tab-code">01 · ÁLGEBRA LINEAL (ℚ)</span>
+          <span class="tab-title">Gauss-Jordan y Núcleo</span>
+          <span class="tab-desc">Escalonamiento RREF, rango y base de Ker(A)</span>
+        </button>
 
-      <section id="tab-gauss" class="panel-section">
-        <header class="section-header">
-          <h2>Eliminación de Gauss-Jordan y Núcleo</h2>
-          <p>Aritmética exacta sobre ℚ. Podés ingresar enteros o fracciones (ej. <code>3/2</code>, <code>-1/4</code>).</p>
-        </header>
+        <button class="nav-item" type="button" role="tab" aria-selected="false" data-tab="sistema">
+          <span class="tab-code">02 · ÁLGEBRA LINEAL (ℚ)</span>
+          <span class="tab-title">Sistemas Lineales (Ax = b)</span>
+          <span class="tab-desc">Rouché-Frobenius, solución particular y homogéneo</span>
+        </button>
 
-        <div class="card">
-          <div class="controls-row">
-            <label>Filas <input id="gj-rows" type="number" min="1" max="8" value="3" /></label>
-            <label>Columnas <input id="gj-cols" type="number" min="1" max="8" value="3" /></label>
-            <button id="gj-resize" class="btn-secondary" type="button">Actualizar grilla</button>
-          </div>
-          <div id="gj-grid" class="matrix-grid"></div>
-          <div class="actions-row">
-            <button id="gj-run" class="btn-primary" type="button">Calcular RREF y Núcleo</button>
+        <button class="nav-item" type="button" role="tab" aria-selected="false" data-tab="funcion">
+          <span class="tab-code">03 · ANÁLISIS MATEMÁTICO I</span>
+          <span class="tab-title">Estudio de Función y Taylor</span>
+          <span class="tab-desc">Derivadas f', f'', Taylor Pₙ(x), raíces, integral y gráfico</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container workspace">
+    <div id="error-banner" class="error-banner hidden" role="alert">
+      <div class="error-banner-body">
+        <strong>Error en los datos:</strong>
+        <span id="error-message"></span>
+      </div>
+      <button id="error-close" class="btn-static btn-sm" type="button">Cerrar</button>
+    </div>
+
+    <!-- ================================================================
+         HERRAMIENTA 1: GAUSS-JORDAN Y NÚCLEO
+         ================================================================ -->
+    <section id="tab-gauss" class="panel-section" role="tabpanel">
+      <div class="tool-header">
+        <h2>Eliminación de Gauss-Jordan y Núcleo sobre ℚ</h2>
+        <p class="tool-lead">Calcula la Forma Escalonada Reducida por Filas (RREF), las columnas pivote, el rango y una base del núcleo <code>Ker(A)</code> usando fracciones exactas sin errores de redondeo.</p>
+        <ol class="howto-strip">
+          <li><strong>Paso 1:</strong> Indicá la cantidad de filas y columnas y tocá <em>Aplicar tamaño</em>.</li>
+          <li><strong>Paso 2:</strong> Escribí los números o fracciones (ej. <code>3/2</code>, <code>-1/4</code>) en cada celda.</li>
+          <li><strong>Paso 3:</strong> Presioná <em>= Calcular RREF y Núcleo</em> para ver los resultados y pasos.</li>
+        </ol>
+      </div>
+
+      <div class="input-pod">
+        <div class="pod-header">
+          <span class="pod-title">Entrada de datos — Matriz A</span>
+          <div class="examples-bar">
+            <span class="examples-label">Ejemplos:</span>
+            <button class="btn-example" type="button" data-gj-example="nucleo">3×3 con núcleo</button>
+            <button class="btn-example" type="button" data-gj-example="fracciones">3×3 con fracciones</button>
+            <button class="btn-example" type="button" data-gj-example="rectangular">Rectangular 2×4</button>
           </div>
         </div>
 
-        <div id="gj-result" class="results hidden">
-          <div class="result-grid-2">
-            <div class="card">
-              <div class="card-header">
-                <h3>Matriz Original (A)</h3>
-                <button class="btn-copy" data-copy-target="gj-orig-raw">Copiar LaTeX</button>
+        <div class="pod-body">
+          <div class="controls-toolbar">
+            <div class="control-group">
+              <label for="gj-rows">Filas (1–8)</label>
+              <input id="gj-rows" class="num-sm" type="number" min="1" max="8" value="3" />
+              <span class="times-sign" aria-hidden="true">×</span>
+              <label for="gj-cols">Columnas (1–8)</label>
+              <input id="gj-cols" class="num-sm" type="number" min="1" max="8" value="3" />
+              <button id="gj-resize" class="btn-static" type="button">Aplicar tamaño</button>
+            </div>
+
+            <div class="control-group control-actions-right">
+              <button id="gj-identity" class="btn-static" type="button">Cargar matriz identidad</button>
+              <button id="gj-clear" class="btn-static" type="button">Limpiar a ceros</button>
+            </div>
+          </div>
+
+          <div class="matrix-stage">
+            <div class="matrix-equation-inline">
+              <span class="matrix-name">A =</span>
+              <div class="matrix-frame">
+                <div id="gj-grid" class="matrix-table-wrap"></div>
               </div>
-              <div id="gj-orig-latex" class="math-box"></div>
+            </div>
+            <p class="field-hint">Valores aceptados: números enteros (<code>-4</code>, <code>0</code>, <code>7</code>) o fracciones exactas (<code>3/2</code>, <code>-1/4</code>). Las celdas vacías equivalen a <code>0</code>.</p>
+          </div>
+
+          <div class="compute-bar">
+            <button id="gj-run" class="btn-compute" type="button">
+              <span class="compute-eq" aria-hidden="true">=</span>
+              <span>Calcular RREF y Núcleo</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="gj-result" class="results-stack hidden">
+        <div class="results-divider"><span>Resultados del cálculo</span></div>
+
+        <div class="pods-row-2">
+          <article class="pod">
+            <div class="pod-header">
+              <h3 class="pod-title">Interpretación de entrada — Matriz A</h3>
+              <button class="btn-static btn-sm btn-copy" type="button" data-copy-target="gj-orig-raw">Copiar LaTeX</button>
+            </div>
+            <div class="pod-body">
+              <div id="gj-orig-latex" class="math-display"></div>
               <input type="hidden" id="gj-orig-raw" />
             </div>
-            <div class="card">
-              <div class="card-header">
-                <h3>Forma Escalonada Reducida (RREF)</h3>
-                <button class="btn-copy" data-copy-target="gj-rref-raw">Copiar LaTeX</button>
-              </div>
-              <div id="gj-rref-latex" class="math-box"></div>
+          </article>
+
+          <article class="pod pod-primary">
+            <div class="pod-header">
+              <h3 class="pod-title">Forma Escalonada Reducida (RREF)</h3>
+              <button class="btn-static btn-sm btn-copy" type="button" data-copy-target="gj-rref-raw">Copiar LaTeX</button>
+            </div>
+            <div class="pod-body">
+              <div id="gj-rref-latex" class="math-display"></div>
               <input type="hidden" id="gj-rref-raw" />
             </div>
-          </div>
+          </article>
+        </div>
 
-          <div class="card">
-            <h3>Propiedades y Subespacio</h3>
-            <div id="gj-meta" class="meta-list"></div>
+        <article class="pod">
+          <div class="pod-header">
+            <h3 class="pod-title">Propiedades algebraicas y Núcleo Ker(A)</h3>
+            <button class="btn-static btn-sm btn-copy" type="button" data-copy-target="gj-nucleo-raw">Copiar LaTeX del núcleo</button>
           </div>
+          <div class="pod-body">
+            <div id="gj-metrics" class="kv-grid"></div>
+            <div class="subpod-block">
+              <div class="subpod-label">Base del subespacio núcleo Ker(A):</div>
+              <div id="gj-nucleo-latex" class="math-display math-left"></div>
+              <div id="gj-nucleo-plain" class="plain-text-line"></div>
+              <input type="hidden" id="gj-nucleo-raw" />
+            </div>
+          </div>
+        </article>
 
-          <div class="card">
-            <h3>Traza de Operaciones Elementales</h3>
+        <article class="pod">
+          <div class="pod-header">
+            <h3 class="pod-title">Procedimiento paso a paso — Operaciones elementales <span id="gj-pasos-count" class="count-tag"></span></h3>
+            <button id="gj-toggle-pasos" class="btn-static btn-sm" type="button" data-toggle-target="gj-pasos-wrap">Ocultar pasos</button>
+          </div>
+          <div id="gj-pasos-wrap" class="pod-body">
+            <p class="notation-key">Notación: <code>Fᵢ &lt;-&gt; Fⱼ</code> intercambio de filas · <code>Fᵢ -&gt; k * Fᵢ</code> escalado · <code>Fᵢ -&gt; Fᵢ + k * Fⱼ</code> combinación lineal.</p>
             <ol id="gj-pasos" class="steps-list"></ol>
           </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         HERRAMIENTA 2: SISTEMAS LINEALES (Ax = b)
+         ================================================================ -->
+    <section id="tab-sistema" class="panel-section hidden" role="tabpanel">
+      <div class="tool-header">
+        <h2>Resolución de Sistemas Lineales (Ax = b)</h2>
+        <p class="tool-lead">Clasifica el sistema según el Teorema de Rouché-Frobenius (SCD, SCI o SI) y calcula con aritmética exacta la solución particular <code>xₚ</code> y la base del sistema homogéneo asociado <code>Sₕ</code>.</p>
+        <ol class="howto-strip">
+          <li><strong>Paso 1:</strong> Elegí cuántas ecuaciones (filas) e incógnitas (columnas) tiene tu sistema.</li>
+          <li><strong>Paso 2:</strong> Completá los coeficientes en <strong>A</strong> y los resultados de cada ecuación en <strong>b</strong>.</li>
+          <li><strong>Paso 3:</strong> Presioná <em>= Resolver Sistema Ax = b</em> para ver la clasificación y solución.</li>
+        </ol>
+      </div>
+
+      <div class="input-pod">
+        <div class="pod-header">
+          <span class="pod-title">Entrada de datos — Sistema Ax = b</span>
+          <div class="examples-bar">
+            <span class="examples-label">Ejemplos:</span>
+            <button class="btn-example" type="button" data-sis-example="sci">Infinitas soluciones (SCI)</button>
+            <button class="btn-example" type="button" data-sis-example="scd">Solución única (SCD)</button>
+            <button class="btn-example" type="button" data-sis-example="si">Sin solución (SI)</button>
+          </div>
         </div>
-      </section>
 
-      <section id="tab-sistema" class="panel-section hidden">
-        <header class="section-header">
-          <h2>Resolución de Sistemas Lineales (Ax = b)</h2>
-          <p>Clasificación por Rouché-Frobenius, solución particular y base del sistema homogéneo asociado.</p>
-        </header>
-
-        <div class="card">
-          <div class="controls-row">
-            <label>Ecuaciones (filas) <input id="sis-rows" type="number" min="1" max="8" value="3" /></label>
-            <label>Incógnitas (cols) <input id="sis-cols" type="number" min="1" max="8" value="3" /></label>
-            <button id="sis-resize" class="btn-secondary" type="button">Actualizar grilla</button>
-          </div>
-          <div class="system-grids">
-            <div>
-              <span class="grid-label">Matriz de coeficientes A</span>
-              <div id="sis-grid-a" class="matrix-grid"></div>
+        <div class="pod-body">
+          <div class="controls-toolbar">
+            <div class="control-group">
+              <label for="sis-rows">Ecuaciones (filas, 1–8)</label>
+              <input id="sis-rows" class="num-sm" type="number" min="1" max="8" value="3" />
+              <span class="times-sign" aria-hidden="true">×</span>
+              <label for="sis-cols">Incógnitas (cols, 1–8)</label>
+              <input id="sis-cols" class="num-sm" type="number" min="1" max="8" value="3" />
+              <button id="sis-resize" class="btn-static" type="button">Aplicar tamaño</button>
             </div>
-            <div>
-              <span class="grid-label">Vector b</span>
-              <div id="sis-grid-b" class="matrix-grid"></div>
+
+            <div class="control-group control-actions-right">
+              <button id="sis-clear" class="btn-static" type="button">Limpiar a ceros</button>
             </div>
           </div>
-          <div class="actions-row">
-            <button id="sis-run" class="btn-primary" type="button">Resolver Sistema</button>
+
+          <div class="matrix-stage">
+            <div class="system-equation-layout">
+              <div class="system-block">
+                <span class="grid-title">Matriz de coeficientes A</span>
+                <div class="matrix-frame">
+                  <div id="sis-grid-a" class="matrix-table-wrap"></div>
+                </div>
+              </div>
+
+              <div class="system-equals" aria-hidden="true">=</div>
+
+              <div class="system-block">
+                <span class="grid-title">Vector b</span>
+                <div class="matrix-frame">
+                  <div id="sis-grid-b" class="matrix-table-wrap"></div>
+                </div>
+              </div>
+            </div>
+            <p class="field-hint">Cada fila <code>Ec. i</code> corresponde a la ecuación <code>aᵢ₁·x₁ + aᵢ₂·x₂ + … = bᵢ</code>. Admite enteros y fracciones (<code>3/2</code>, <code>-5/4</code>).</p>
+          </div>
+
+          <div class="compute-bar">
+            <button id="sis-run" class="btn-compute" type="button">
+              <span class="compute-eq" aria-hidden="true">=</span>
+              <span>Resolver Sistema Ax = b</span>
+            </button>
           </div>
         </div>
+      </div>
 
-        <div id="sis-result" class="results hidden">
-          <div class="card">
-            <div class="card-header">
-              <h3>Clasificación y Conjunto Solución</h3>
-              <span id="sis-badge" class="badge"></span>
-            </div>
-            <div id="sis-solucion" class="meta-list"></div>
+      <div id="sis-result" class="results-stack hidden">
+        <div class="results-divider"><span>Resultados del cálculo</span></div>
+
+        <article class="pod">
+          <div class="pod-header">
+            <h3 class="pod-title">Interpretación de entrada y clasificación</h3>
+            <button class="btn-static btn-sm btn-copy" type="button" data-copy-target="sis-input-raw">Copiar LaTeX de A</button>
           </div>
+          <div class="pod-body">
+            <div class="classification-row">
+              <span id="sis-badge" class="class-badge"></span>
+              <span id="sis-clasificacion-desc" class="class-desc"></span>
+            </div>
+            <div class="subpod-block">
+              <div class="subpod-label">Sistema ingresado:</div>
+              <div id="sis-input-latex" class="math-display math-left"></div>
+              <input type="hidden" id="sis-input-raw" />
+            </div>
+          </div>
+        </article>
 
-          <div class="card">
-            <h3>Traza de Operaciones Elementales</h3>
+        <article class="pod pod-primary">
+          <div class="pod-header">
+            <h3 class="pod-title">Conjunto Solución (S)</h3>
+            <button class="btn-static btn-sm btn-copy" type="button" data-copy-target="sis-sol-raw">Copiar LaTeX</button>
+          </div>
+          <div class="pod-body">
+            <div id="sis-solucion-latex" class="math-display math-left"></div>
+            <input type="hidden" id="sis-sol-raw" />
+            <div id="sis-solucion" class="detail-list"></div>
+          </div>
+        </article>
+
+        <article class="pod">
+          <div class="pod-header">
+            <h3 class="pod-title">Procedimiento paso a paso — Matriz ampliada [A | b] <span id="sis-pasos-count" class="count-tag"></span></h3>
+            <button id="sis-toggle-pasos" class="btn-static btn-sm" type="button" data-toggle-target="sis-pasos-wrap">Ocultar pasos</button>
+          </div>
+          <div id="sis-pasos-wrap" class="pod-body">
+            <p class="notation-key">Operaciones elementales aplicadas por Gauss-Jordan sobre la matriz ampliada <code>[A | b]</code>.</p>
             <ol id="sis-pasos" class="steps-list"></ol>
           </div>
-        </div>
-      </section>
+        </article>
+      </div>
+    </section>
 
-      <section id="tab-funcion" class="panel-section hidden">
-        <header class="section-header">
-          <h2>Estudio Analítico de Función y Polinomio de Taylor</h2>
-          <p>Soporta polinomios, potencias y funciones: <code>sin</code>, <code>cos</code>, <code>exp</code>, <code>ln</code>, <code>sqrt</code>, <code>pi</code>, <code>e</code>.</p>
-        </header>
+    <!-- ================================================================
+         HERRAMIENTA 3: ESTUDIO DE FUNCIÓN Y TAYLOR
+         ================================================================ -->
+    <section id="tab-funcion" class="panel-section hidden" role="tabpanel">
+      <div class="tool-header">
+        <h2>Estudio Analítico de Función y Polinomio de Taylor</h2>
+        <p class="tool-lead">Obtiene derivadas simbólicas <code>f'(x)</code> y <code>f''(x)</code>, el polinomio de Taylor <code>Pₙ(x)</code>, raíces aproximadas, puntos críticos, integral definida por Simpson y el gráfico comparativo en <code>[a, b]</code>.</p>
+        <ol class="howto-strip">
+          <li><strong>Paso 1:</strong> Escribí la expresión en variable <code>x</code> o insertá funciones con los botones.</li>
+          <li><strong>Paso 2:</strong> Definí el intervalo <code>[a, b]</code>, el centro <code>x₀</code> y el orden <code>n</code> de Taylor.</li>
+          <li><strong>Paso 3:</strong> Presioná el botón <em>=</em> o <em>Analizar y Graficar</em> (o la tecla Enter).</li>
+        </ol>
+      </div>
 
-        <div class="card">
-          <div class="form-grid">
-            <label class="full-width">
-              Expresión f(x)
-              <input id="fn-expr" type="text" class="mono-input" value="x^3 - 3x" placeholder="Ej: x^3 - 3x + sin(x)" />
-            </label>
-            <label>Extremo a <input id="fn-a" type="number" step="0.5" value="-3" /></label>
-            <label>Extremo b <input id="fn-b" type="number" step="0.5" value="3" /></label>
-            <label>Centro Taylor x₀ <input id="fn-x0" type="number" step="0.5" value="0" /></label>
-            <label>Orden Taylor n <input id="fn-orden" type="number" min="0" max="10" value="3" /></label>
+      <div class="input-pod">
+        <div class="pod-header">
+          <span class="pod-title">Entrada de datos — Función f(x)</span>
+          <div class="examples-bar">
+            <span class="examples-label">Ejemplos:</span>
+            <button class="btn-example" type="button" data-fn-example="cubica">x³ - 3x</button>
+            <button class="btn-example" type="button" data-fn-example="seno">sin(x)</button>
+            <button class="btn-example" type="button" data-fn-example="exponencial">e^x - 2x - 1</button>
+            <button class="btn-example" type="button" data-fn-example="logaritmo">ln(x) - x + 2</button>
           </div>
-          <div class="actions-row">
-            <button id="fn-run" class="btn-primary" type="button">Analizar y Graficar</button>
-          </div>
         </div>
 
-        <div id="fn-result" class="results hidden">
-          <div class="card">
-            <h3>Derivadas Simbólicas y Polinomio de Taylor</h3>
-            <div class="formulas-stack">
+        <div class="pod-body">
+          <label class="formula-bar-label" for="fn-expr">Ingresá la fórmula matemática en función de <code>x</code>:</label>
+          <div class="formula-input-bar">
+            <span class="formula-prefix" aria-hidden="true">f(x) =</span>
+            <input
+              id="fn-expr"
+              type="text"
+              class="formula-field"
+              value="x^3 - 3x"
+              placeholder="Ej: x^3 - 3x + sin(x)"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button id="fn-run-inline" class="btn-compute-inline" type="button" title="Calcular estudio de la función">
+              <span class="compute-eq" aria-hidden="true">=</span>
+              <span>Calcular</span>
+            </button>
+          </div>
+
+          <div class="symbol-palette" aria-label="Paleta de funciones y operadores">
+            <span class="palette-label">Insertar símbolo:</span>
+            <button class="btn-sym" type="button" data-insert="x^2">x²</button>
+            <button class="btn-sym" type="button" data-insert="x^3">x³</button>
+            <button class="btn-sym" type="button" data-insert="^">^</button>
+            <button class="btn-sym" type="button" data-insert="/">/</button>
+            <button class="btn-sym" type="button" data-insert="()">( )</button>
+            <button class="btn-sym" type="button" data-insert="sin(x)">sin(x)</button>
+            <button class="btn-sym" type="button" data-insert="cos(x)">cos(x)</button>
+            <button class="btn-sym" type="button" data-insert="e^x">eˣ</button>
+            <button class="btn-sym" type="button" data-insert="ln(x)">ln(x)</button>
+            <button class="btn-sym" type="button" data-insert="sqrt(x)">√x</button>
+            <button class="btn-sym" type="button" data-insert="pi">π</button>
+            <button id="fn-clear" class="btn-sym btn-sym-clear" type="button">Borrar</button>
+          </div>
+
+          <p class="syntax-note">
+            Sintaxis admitida: variable <code>x</code> · operadores <code>+ - * / ^</code> · multiplicación implícita (<code>3x</code>, <code>2sin(x)</code>) · funciones <code>sin</code>, <code>cos</code>, <code>exp</code>, <code>ln</code>, <code>sqrt</code> · constantes <code>pi</code>, <code>e</code>.
+          </p>
+
+          <div class="params-grid">
+            <fieldset class="param-group">
+              <legend>Intervalo de estudio [a, b]</legend>
+              <div class="param-fields">
+                <label class="param-field">
+                  <span>Extremo inferior (a)</span>
+                  <input id="fn-a" type="number" step="any" value="-3" />
+                </label>
+                <label class="param-field">
+                  <span>Extremo superior (b)</span>
+                  <input id="fn-b" type="number" step="any" value="3" />
+                </label>
+              </div>
+              <p class="param-help">Rango usado para el gráfico, raíces, puntos críticos e integral definida.</p>
+            </fieldset>
+
+            <fieldset class="param-group">
+              <legend>Polinomio de Taylor Pₙ(x)</legend>
+              <div class="param-fields">
+                <label class="param-field">
+                  <span>Centro (x₀)</span>
+                  <input id="fn-x0" type="number" step="any" value="0" />
+                </label>
+                <label class="param-field">
+                  <span>Orden (n, de 0 a 10)</span>
+                  <input id="fn-orden" type="number" min="0" max="10" step="1" value="3" />
+                </label>
+              </div>
+              <p class="param-help">Calcula la aproximación polinómica de grado <code>n</code> alrededor de <code>x₀</code>.</p>
+            </fieldset>
+          </div>
+
+          <div class="compute-bar">
+            <button id="fn-run" class="btn-compute" type="button">
+              <span class="compute-eq" aria-hidden="true">=</span>
+              <span>Analizar Función y Graficar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="fn-result" class="results-stack hidden">
+        <div class="results-divider"><span>Resultados del cálculo</span></div>
+
+        <article class="pod pod-primary">
+          <div class="pod-header">
+            <h3 class="pod-title">Cálculo simbólico — Derivadas y Polinomio de Taylor</h3>
+          </div>
+          <div class="pod-body pod-body-flush">
+            <div class="formula-table">
               <div class="formula-row">
-                <span class="formula-tag">f(x)</span>
+                <div class="formula-meta">
+                  <span class="formula-tag">f(x)</span>
+                  <span class="formula-desc">Función interpretada</span>
+                </div>
                 <div id="fn-f-latex" class="math-inline"></div>
-                <button class="btn-copy" data-copy-target="fn-f-raw">Copiar LaTeX</button>
+                <button class="btn-static btn-sm btn-copy" type="button" data-copy-target="fn-f-raw">Copiar LaTeX</button>
                 <input type="hidden" id="fn-f-raw" />
               </div>
+
               <div class="formula-row">
-                <span class="formula-tag">f'(x)</span>
+                <div class="formula-meta">
+                  <span class="formula-tag">f'(x)</span>
+                  <span class="formula-desc">Primera derivada</span>
+                </div>
                 <div id="fn-d1-latex" class="math-inline"></div>
-                <button class="btn-copy" data-copy-target="fn-d1-raw">Copiar LaTeX</button>
+                <button class="btn-static btn-sm btn-copy" type="button" data-copy-target="fn-d1-raw">Copiar LaTeX</button>
                 <input type="hidden" id="fn-d1-raw" />
               </div>
+
               <div class="formula-row">
-                <span class="formula-tag">f''(x)</span>
+                <div class="formula-meta">
+                  <span class="formula-tag">f''(x)</span>
+                  <span class="formula-desc">Segunda derivada</span>
+                </div>
                 <div id="fn-d2-latex" class="math-inline"></div>
-                <button class="btn-copy" data-copy-target="fn-d2-raw">Copiar LaTeX</button>
+                <button class="btn-static btn-sm btn-copy" type="button" data-copy-target="fn-d2-raw">Copiar LaTeX</button>
                 <input type="hidden" id="fn-d2-raw" />
               </div>
+
               <div class="formula-row">
-                <span class="formula-tag">Pₙ(x)</span>
+                <div class="formula-meta">
+                  <span class="formula-tag" id="fn-taylor-tag">Pₙ(x)</span>
+                  <span class="formula-desc" id="fn-taylor-desc">Polinomio de Taylor</span>
+                </div>
                 <div id="fn-taylor-latex" class="math-inline"></div>
-                <button class="btn-copy" data-copy-target="fn-taylor-raw">Copiar LaTeX</button>
+                <button class="btn-static btn-sm btn-copy" type="button" data-copy-target="fn-taylor-raw">Copiar LaTeX</button>
                 <input type="hidden" id="fn-taylor-raw" />
               </div>
             </div>
           </div>
+        </article>
 
-          <div class="card">
-            <h3>Gráfico en [a, b]</h3>
+        <article class="pod">
+          <div class="pod-header">
+            <h3 class="pod-title" id="fn-chart-title">Gráfico comparativo en [a, b]</h3>
+            <button id="fn-download-chart" class="btn-static btn-sm" type="button">Descargar PNG</button>
+          </div>
+          <div class="pod-body">
             <div class="chart-wrap">
               <canvas id="fn-chart"></canvas>
             </div>
           </div>
+        </article>
 
-          <div class="result-grid-2">
-            <div class="card">
-              <h3>Raíces e Integral Definida</h3>
-              <div id="fn-resumen" class="meta-list"></div>
+        <div class="pods-row-2">
+          <article class="pod">
+            <div class="pod-header">
+              <h3 class="pod-title">Raíces e Integral Definida</h3>
             </div>
-            <div class="card">
-              <h3>Puntos Críticos</h3>
-              <table class="data-table">
-                <thead>
-                  <tr><th>x</th><th>f(x)</th><th>f''(x)</th><th>Clasificación</th></tr>
-                </thead>
-                <tbody id="fn-criticos"></tbody>
-              </table>
+            <div class="pod-body">
+              <div id="fn-resumen" class="detail-list"></div>
             </div>
-          </div>
+          </article>
+
+          <article class="pod">
+            <div class="pod-header">
+              <h3 class="pod-title">Puntos Críticos (f'(x) = 0)</h3>
+            </div>
+            <div class="pod-body pod-body-flush">
+              <div class="table-scroll">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>x</th>
+                      <th>f(x)</th>
+                      <th>f''(x)</th>
+                      <th>Clasificación</th>
+                    </tr>
+                  </thead>
+                  <tbody id="fn-criticos"></tbody>
+                </table>
+              </div>
+            </div>
+          </article>
         </div>
-      </section>
-    </main>
-  </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span><strong>ExactaPy</strong> · Álgebra Lineal exacta sobre ℚ y Análisis Matemático I</span>
+      <span>Interfaz académica de cálculo simbólico y numérico</span>
+    </div>
+  </footer>
 </body>
 </html>
